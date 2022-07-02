@@ -8,7 +8,7 @@ static std::mutex lock;
 bool publish(std::PID client, uint64_t name) {
 	lock.acquire();
 
-	if(names.find(name) != names.end()) {
+	if(names[name]) {
 		lock.release();
 		return false;
 	}
@@ -22,13 +22,14 @@ std::PID resolve(std::PID client, uint64_t name) {
 	IGNORE(client);
 	lock.acquire();
 
-	if(names.find(name) == names.end()) {
+	if(!names[name]) {
 		lock.release();
 		return 0;
 	}
 
+	auto ret = names[name];
 	lock.release();
-	return names[name];
+	return ret;
 }
 
 extern "C" void _start() {
